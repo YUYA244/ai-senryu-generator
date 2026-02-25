@@ -21,7 +21,6 @@ async function generateDailySenryu() {
         // --- 1. Yahoo!ニュース(RSS)から最新ニュースを取得 ---
         console.log("🌐 ニュースを取得中...");
         
-        // NewsAPI無料版のブロックを回避するためYahooRSSを使用（APIキー不要）
         const rssUrl = 'https://news.yahoo.co.jp/rss/topics/top-picks.xml';
         const response = await fetch(rssUrl);
         const xmlText = await response.text();
@@ -32,7 +31,6 @@ async function generateDailySenryu() {
             return;
         }
 
-        // 最初のニュース記事を抽出
         const firstItem = items[1];
         const titleMatch = firstItem.match(/<title>(.*?)<\/title>/);
         const linkMatch = firstItem.match(/<link>(.*?)<\/link>/);
@@ -53,7 +51,8 @@ async function generateDailySenryu() {
         console.log("🤖 Geminiで川柳を生成中...");
         
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // 新しい安全なモデル名へ変更
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
         const prompt = `
             あなたは日本に住む、少し皮肉屋でユーモアのある隠居です。
