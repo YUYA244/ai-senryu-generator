@@ -52,7 +52,7 @@ async function generateDailySenryu() {
         
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         // 新しい安全なモデル名へ変更
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
             あなたは日本に住む、少し皮肉屋でユーモアのある隠居です。
@@ -101,3 +101,4 @@ async function generateDailySenryu() {
 }
 
 generateDailySenryu();
+
