@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="毎日のニュースからAIが生成する風刺川柳。">
+    <title>AI 日めくり風刺川柳</title>
+    <!-- 和風フォントとして Noto Serif JP を利用 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <main class="container">
+        <header>
+            <div class="header-icon"><i class="fa-solid fa-leaf"></i></div>
+            <h1>AI 日めくり風刺川柳</h1>
+            <p class="date-display" id="current-date">--月--日</p>
+        </header>
+
+        <div class="washi-card">
+            <div class="senryu-content" id="senryu-display">
+                <span class="loading">昨今のニュースを詠み込み中...</span>
+            </div>
+
+            <div class="explanation-section" id="explanation-display">
+                <!-- AIによる解説がここに入ります -->
+            </div>
+
+            <div class="news-source" id="news-source-display">
+                <!-- 元となったニュースソースがここに入ります -->
+            </div>
+
+            <div class="actions">
+                <button id="share-x-btn" class="btn-share" disabled>
+                    <i class="fa-brands fa-x-twitter"></i> <span>詠み人を気取ってXで共有する</span>
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p>※ 3日前〜前日のニュースを元にAIが毎朝自動生成しています</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

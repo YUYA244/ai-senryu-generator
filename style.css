@@ -1,0 +1,280 @@
+:root {
+    --bg-color: #f4f1eb;
+    /* 和紙のような生成り色 */
+    --card-bg: #ffffff;
+    --text-main: #333333;
+    /* 墨色 */
+    --text-sub: #666666;
+    --matcha-main: #8c905e;
+    /* 抹茶色 */
+    --matcha-light: #e6e9d8;
+    /* 淡い抹茶色 */
+    --matcha-dark: #5a5f3d;
+    /* 濃い抹茶色 */
+    --border-color: #dcd8c0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Serif JP', serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 極薄いノイズで和紙の質感を表現 */
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem 1.5rem;
+    z-index: 1;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-icon {
+    font-size: 2rem;
+    color: var(--matcha-main);
+    margin-bottom: 0.5rem;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    color: var(--matcha-dark);
+}
+
+.date-display {
+    color: var(--text-sub);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+}
+
+/* Washi Card (和風の柔らかいカード) */
+.washi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    /* 角を少しだけ丸くして柔らかさを出す */
+    padding: 3rem 2rem;
+    box-shadow: 0 10px 30px -10px rgba(90, 95, 61, 0.15);
+    /* 抹茶色の薄い影 */
+    position: relative;
+    transition: transform 0.4s ease;
+}
+
+.washi-card:hover {
+    transform: translateY(-3px);
+}
+
+/* 四隅の和風アクセント（折り紙や角飾りのような演出） */
+.washi-card::before,
+.washi-card::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--matcha-light);
+}
+
+.washi-card::before {
+    top: 10px;
+    left: 10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.washi-card::after {
+    bottom: 10px;
+    right: 10px;
+    border-left: none;
+    border-top: none;
+}
+
+/* Senryu Display */
+.senryu-content {
+    margin-bottom: 3rem;
+    min-height: 260px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.senryu-text {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    margin: 0 auto;
+    display: inline-block;
+    height: 240px;
+    /* 必要に応じて調整。縦長すぎないようにする */
+}
+
+/* 3行を並べる。右から左へ並ぶ */
+.senryu-text p {
+    font-size: 1.8rem;
+    color: var(--text-main);
+    letter-spacing: 0.15em;
+    line-height: 1.2;
+    margin-left: 2rem;
+    /* カラム間（行間）の隙間 */
+}
+
+.senryu-text p:last-child {
+    margin-left: 0;
+    /* 最後の列はマージンなし */
+}
+
+/* 3行を少しずつずらして伝統的な表現に */
+.senryu-text p:nth-child(1) {
+    padding-top: 0;
+}
+
+.senryu-text p:nth-child(2) {
+    padding-top: 2rem;
+    /* 中の句を下げる */
+}
+
+.senryu-text p:nth-child(3) {
+    padding-top: 4rem;
+    /* 下の句をさらに下げる */
+}
+
+.loading {
+    color: var(--matcha-main);
+    font-size: 1rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* ニュース解説とソース */
+.explanation-section {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--text-main);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--border-color);
+    /* 和紙の継ぎ目のような柔らかい線 */
+}
+
+.news-source {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.news-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--matcha-main);
+}
+
+.news-source a {
+    color: var(--matcha-dark);
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: bold;
+}
+
+.news-source a:hover {
+    color: var(--matcha-main);
+    text-decoration: underline;
+    text-decoration-color: var(--matcha-main);
+}
+
+/* はんこ風の飾りをShareボタンに反映 */
+.actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-share {
+    background: #ffffff;
+    color: var(--text-main);
+    border: 2px solid var(--matcha-main);
+    border-radius: 4px;
+    /* 四角くして印鑑風のニュアンス */
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-family: 'Noto Serif JP', serif;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-share:hover:not(:disabled) {
+    background: var(--matcha-main);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(140, 144, 94, 0.3);
+}
+
+.btn-share:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--border-color);
+    color: var(--border-color);
+}
+
+.btn-share i {
+    font-size: 1.1rem;
+}
+
+footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--text-sub);
+    font-size: 0.8rem;
+}
+
+/* スマホ表示向けの調整 */
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .washi-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .senryu-text p {
+        font-size: 1.5rem;
+        margin-left: 1.2rem;
+    }
+
+    .senryu-text {
+        height: 200px;
+    }
+}
