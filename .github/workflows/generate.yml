@@ -1,0 +1,45 @@
+name: Daily AI Senryu Generator
+
+on:
+  schedule:
+    # 毎日 日本時間(JST)の朝7:00に実行します (UTCの22:00)
+    - cron: '0 22 * * *'
+  # 手動でも実行できるようにする設定
+  workflow_dispatch:
+
+jobs:
+  generate-senryu:
+    runs-on: ubuntu-latest
+    
+    # ワークフローからリポジトリにコミットをプッシュするための権限設定
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリのソースコードをチェックアウト
+        uses: actions/checkout@v4
+        
+      - name: Node.jsのセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: パッケージのインストール
+        run: npm ci || npm install
+
+      - name: 自動生成スクリプトを実行
+        run: npm start
+        env:
+          # GitHubのリポジトリ設定(Secrets)に登録したAPIキーを読み込ませます
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: 生成された川柳(JSON)をリポジトリに保存してコミット
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          # dataフォルダ内に追加/変更があればコミット
+          git add data/senryu_today.json
+          git commit -m "chore: 毎日のAI風刺川柳の自動生成 [skip ci]" || echo "No changes to commit"
+          git push origin main
