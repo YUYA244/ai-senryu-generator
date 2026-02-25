@@ -8,8 +8,9 @@
     "start": "node generator.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.1.1",
+  "@google/generative-ai": "latest",
     "dotenv": "^16.4.5",
     "node-fetch": "^3.3.2"
   }
 }
+
