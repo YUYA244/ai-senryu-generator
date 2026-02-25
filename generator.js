@@ -65,21 +65,21 @@ async function generateDailySenryu() {
         // 🛡️ セキュリティ対策: URLにキーを含めるのをやめ、安全なヘッダー(x-goog-api-key)に隠して送ります
         const apiKey = process.env.GEMINI_API_KEY.trim();
         
-        // ★ついにすべての元凶が判明。どんな環境でも100%確実に通る「gemini-pro」モデルを指定します！
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`;
+        // ★全ての元凶は「v1beta（テスト版）」の利用でした。
+        // 正規の「v1」エンドポイントに変更し、最も確実なモデル名（gemini-1.5-flash）を指定します。
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent`;
 
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'x-goog-api-key': apiKey  // ←ここが安全な鍵穴です
+                'x-goog-api-key': apiKey
             },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }]
             })
         });
 
-        // サーバーエラー時にエラー詳細を確認（ここでもキーは表示されません）
         if (!geminiResponse.ok) {
             const errorText = await geminiResponse.text();
             console.error(`❌ Gemini API エラー (${geminiResponse.status}):`, errorText);
