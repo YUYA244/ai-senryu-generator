@@ -64,7 +64,7 @@ async function generateDailySenryu() {
 
         // 🛡️ セキュリティ対策: URLにキーを含めるのをやめ、安全なヘッダー(x-goog-api-key)に隠して送ります
         const apiKey = process.env.GEMINI_API_KEY.trim();
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`;
 
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -118,3 +118,4 @@ async function generateDailySenryu() {
 }
 
 generateDailySenryu();
+
