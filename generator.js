@@ -1,6 +1,5 @@
 import fs from 'fs';
 import fetch from 'node-fetch';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -47,13 +46,9 @@ async function generateDailySenryu() {
         console.log(`🗞️ ピックアップしたニュース: ${topNews.title}`);
 
 
-        // --- 2. Gemini API を使って川柳を生成 ---
+        // --- 2. Gemini 本体と直接通信して川柳を生成！ ---
         console.log("🤖 Geminiで川柳を生成中...");
         
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        // 新しい安全なモデル名へ変更
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
         const prompt = `
             あなたは日本に住む、少し皮肉屋でユーモアのある隠居です。
             以下の最近のニュースのタイトルから内容を推測し、ユーモアと少しの皮肉を交えた風刺川柳（5・7・5）を作成してください。
@@ -67,8 +62,30 @@ async function generateDailySenryu() {
             }
         `;
 
-        const result = await model.generateContent(prompt);
-        let aiResultStr = result.response.text().trim();
+        // 🛡️ セキュリティ対策: URLにキーを含めるのをやめ、安全なヘッダー(x-goog-api-key)に隠して送ります
+        const apiKey = process.env.GEMINI_API_KEY.trim();
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+
+        const geminiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey  // ←ここが安全な鍵穴です
+            },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+
+        // サーバーエラー時にエラー詳細を確認（ここでもキーは表示されません）
+        if (!geminiResponse.ok) {
+            const errorText = await geminiResponse.text();
+            console.error(`❌ Gemini API エラー (${geminiResponse.status}):`, errorText);
+            return;
+        }
+
+        const data = await geminiResponse.json();
+        let aiResultStr = data.candidates[0].content.parts[0].text.trim();
         
         if (aiResultStr.startsWith('```json')) {
             aiResultStr = aiResultStr.replace(/^```json/, '').replace(/```$/, '').trim();
@@ -96,11 +113,8 @@ async function generateDailySenryu() {
         console.log(finalData);
 
     } catch (error) {
-        console.error("❌ エラーが発生しました:", error);
+        console.error("❌ 予期せぬエラーが発生しました:", error);
     }
 }
 
 generateDailySenryu();
-
-
-
