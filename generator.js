@@ -9,10 +9,10 @@ const DATA_DIR = path.resolve('data');
 const DATA_FILE = path.join(DATA_DIR, 'senryu_today.json');
 
 async function generateDailySenryu() {
-    console.log("=== AI風刺川柳 自動生成処理を開始します ===");
+    console.log("=== AI風刺川柳 自動生成処理を開始します (Claude版) ===");
 
-    if (!process.env.GEMINI_API_KEY) {
-        console.error("❌ エラー: GEMINI_API_KEY が設定されていません。");
+    if (!process.env.ANTHROPIC_API_KEY) {
+        console.error("❌ エラー: ANTHROPIC_API_KEY が設定されていません。");
         return;
     }
 
@@ -46,48 +46,50 @@ async function generateDailySenryu() {
         console.log(`🗞️ ピックアップしたニュース: ${topNews.title}`);
 
 
-        // --- 2. Gemini 本体と直接通信して川柳を生成！ ---
-        console.log("🤖 Geminiで川柳を生成中...");
+        // --- 2. Claude API を使って川柳を生成！ ---
+        console.log("🤖 Claudeで川柳を生成中...");
         
         const prompt = `
-            あなたは日本に住む、少し皮肉屋でユーモアのある隠居です。
-            以下の最近のニュースのタイトルから内容を推測し、ユーモアと少しの皮肉を交えた風刺川柳（5・7・5）を作成してください。
+あなたは日本に住む、少し皮肉屋でユーモアのある隠居です。
+以下の最近のニュースのタイトルから内容を推測し、ユーモアと少しの皮肉を交えた風刺川柳（5・7・5）を作成してください。
 
-            ニュースタイトル: ${topNews.title}
+ニュースタイトル: ${topNews.title}
 
-            以下のJSON形式で出力してください：
-            {
-                "senryu": "〇〇〇\\n〇〇〇〇〇〇〇\\n〇〇〇",
-                "explanation": "なぜこの川柳を作ったのかの短い解説（面白い皮肉を込めて）"
-            }
-        `;
+以下のJSON形式で出力してください。JSON以外の文章は絶対に含めないでください：
+{
+    "senryu": "〇〇〇\\n〇〇〇〇〇〇〇\\n〇〇〇",
+    "explanation": "なぜこの川柳を作ったのかの短い解説（面白い皮肉を込めて）"
+}
+`;
 
-        // 🛡️ セキュリティ対策: URLにキーを含めるのをやめ、安全なヘッダー(x-goog-api-key)に隠して送ります
-        const apiKey = process.env.GEMINI_API_KEY.trim();
-        
-        // ★全ての元凶は「v1beta（テスト版）」の利用でした。
-        // 正規の「v1」エンドポイントに変更し、最も確実なモデル名（gemini-1.5-flash）を指定します。
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent`;
+        // ClaudeのAPIと直接通信
+        const apiKey = process.env.ANTHROPIC_API_KEY.trim();
+        const claudeUrl = `https://api.anthropic.com/v1/messages`;
 
-        const geminiResponse = await fetch(geminiUrl, {
+        const claudeResponse = await fetch(claudeUrl, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'x-goog-api-key': apiKey
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                model: "claude-3-haiku-20240307", // 高速・安価で高性能な「Haiku」モデルを使用
+                max_tokens: 500,
+                messages: [
+                    { role: "user", content: prompt }
+                ]
             })
         });
 
-        if (!geminiResponse.ok) {
-            const errorText = await geminiResponse.text();
-            console.error(`❌ Gemini API エラー (${geminiResponse.status}):`, errorText);
+        if (!claudeResponse.ok) {
+            const errorText = await claudeResponse.text();
+            console.error(`❌ Claude API エラー (${claudeResponse.status}):`, errorText);
             return;
         }
 
-        const data = await geminiResponse.json();
-        let aiResultStr = data.candidates[0].content.parts[0].text.trim();
+        const data = await claudeResponse.json();
+        let aiResultStr = data.content[0].text.trim();
         
         if (aiResultStr.startsWith('```json')) {
             aiResultStr = aiResultStr.replace(/^```json/, '').replace(/```$/, '').trim();
