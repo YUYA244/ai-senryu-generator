@@ -74,7 +74,7 @@ async function generateDailySenryu() {
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({
-                model: "claude-3-5-sonnet-20241022", // 最新・最高性能の「Sonnet 3.5」モデルを使用
+                model: "claude-haiku-4-5", // 2026年最新の高速モデル「Haiku 4.5」を使用
                 max_tokens: 500,
                 messages: [
                     { role: "user", content: prompt }
