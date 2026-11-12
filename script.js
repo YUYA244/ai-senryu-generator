@@ -12,6 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentSenryuText = '';
 
+    // 🛡️ XSS対策: 外部データのHTMLエスケープ関数
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // 川柳データの取得処理
     async function fetchTodaySenryu() {
         try {
@@ -45,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const lines = data.senryu.split('\n');
         let senryuHtml = '<div class="senryu-text">';
         lines.forEach(line => {
-            senryuHtml += `<p>${line}</p>`;
+            // 🛡️ XSS対策: escapeHtmlでサニタイズしてから描画
+            senryuHtml += `<p>${escapeHtml(line)}</p>`;
         });
         senryuHtml += '</div>';
 
@@ -56,12 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
         senryuDisplay.style.opacity = '0';
         setTimeout(() => {
             senryuDisplay.innerHTML = senryuHtml;
-            explanationDisplay.innerHTML = `<p>${data.explanation}</p>`;
+            // 🛡️ XSS対策: 解説文もエスケープしてから描画
+            explanationDisplay.innerHTML = `<p>${escapeHtml(data.explanation)}</p>`;
 
-            if (data.news_title && data.news_url) {
+            // 🛡️ URLスキーム検証: https:// のURLのみ許可（javascript: 攻撃を防ぐ）
+            if (data.news_title && data.news_url && data.news_url.startsWith('https://')) {
                 newsSourceDisplay.innerHTML = `
                     <span class="news-label">元ネタになったニュース</span>
-                    <a href="${data.news_url}" target="_blank" rel="noopener noreferrer">${data.news_title}</a>
+                    <a href="${escapeHtml(data.news_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.news_title)}</a>
                 `;
             }
 
